@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Critical Section Simulator - Strict Alternation Method</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: palegreen;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .container {
+    text-align: center;
+    align-items: center;
+    height: 50vh;
+    width: 50vh;
+  }
+  .section {
+    background-color: coral;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+  .button:hover {
+    background-color: #45a049;
+  }
+  .process {
+    margin-bottom: 5px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="section">
+    <h2>Critical Section - Strict Alternation Method with Busy Waiting</h2>
+    <div id="critical-section"></div>
+    <div id="queue"></div>
+    <button class="button" onclick="addProcess()">Add Process</button>
+    <input type="number" id="process-time" placeholder="Enter Process Time (in seconds)">
+  </div>
+</div>
+
+<script>
+  let inCriticalSection = false;
+  let processQueue = [];
+  let turn = 0; // Indicates whose turn it is to enter the critical section
+
+  function addProcess() {
+    const processTime = parseInt(document.getElementById('process-time').value);
+    if (isNaN(processTime) || processTime <= 0) {
+      alert("Please enter a valid process time.");
+      return;
+    }
+    processQueue.push(processTime);
+    displayQueue();
+    if (!inCriticalSection) {
+      executeNextProcess();
+    }
+  }
+
+  async function executeNextProcess() {
+    if (!inCriticalSection && processQueue.length > 0) {
+        inCriticalSection = true;
+        const currentProcessTime = processQueue.shift();
+        document.getElementById('critical-section').innerHTML = `Process in Critical Section (${currentProcessTime} seconds remaining)`;
+        displayQueue(); // Display the queue
+        setTimeout(() => {
+            inCriticalSection = false;
+            document.getElementById('critical-section').innerHTML = "";
+            executeNextProcess(); // Check for the next process
+        }, currentProcessTime * 1000);
+    }
+}
+
+
+
+  function displayQueue() {
+    const queueElement = document.getElementById('queue');
+    queueElement.innerHTML = '<h3>Process Queue:</h3>';
+    if (processQueue.length === 0) {
+      queueElement.innerHTML += '<p>No processes in queue.</p>';
+    } else {
+      queueElement.innerHTML += '<ul>';
+      processQueue.forEach((processTime, index) => {
+        queueElement.innerHTML += `<li class="process">Process ${index + 1} (${processTime} seconds)</li>`;
+      });
+      queueElement.innerHTML += '</ul>';
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dining Philosophers Simulation</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .table {
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background-color: #d1d5db; /* Light gray color */
+            position: relative;
+            margin: 0 auto;
+            margin-top: 50px;
+        }
+
+        .philosopher {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: #3b82f6; /* Blue color */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #fff; /* White color */
+        }
+
+        .philosopher-label {
+            font-size: 14px;
+            color: #000; /* Black color */
+            text-align: center;
+            position: absolute;
+            top: -30px; /* Adjusted */
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .philosopher-buttons {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 50%;
+            right: -70px; /* Adjusted */
+            transform: translateY(-50%);
+        }
+
+        .philosopher-button {
+            margin-bottom: 10px; /* Adjusted */
+        }
+
+        .philosopher:nth-child(1) { /* Top Left */
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+
+        .philosopher:nth-child(2) { /* Bottom Left */
+            top: 75%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+
+        .philosopher:nth-child(3) { /* Top Right */
+            top: 50%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 p-10" style="background-color: palegreen;">
+    <h1 class="text-3xl text-center font-bold mb-8">Dining Philosophers Simulation</h1>
+    <div class="table relative">
+        <div class="philosopher">
+            <span class="philosopher-label">Philosopher 1</span>
+            <div class="philosopher-buttons">
+                <button id="think1" onclick="think(1)" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md philosopher-button">Think</button>
+                <button id="eat1" onclick="eat(1)" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md philosopher-button">Eat</button>
+                <button id="free1" onclick="free(1)" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md philosopher-button" disabled>Free</button>
+            </div>
+        </div>
+        <div class="philosopher">
+            <span class="philosopher-label">Philosopher 2</span>
+            <div class="philosopher-buttons">
+                <button id="think2" onclick="think(2)" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md philosopher-button">Think</button>
+                <button id="eat2" onclick="eat(2)" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md philosopher-button">Eat</button>
+                <button id="free2" onclick="free(2)" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md philosopher-button" disabled>Free</button>
+            </div>
+        </div>
+        <div class="philosopher">
+            <span class="philosopher-label">Philosopher 3</span>
+            <div class="philosopher-buttons">
+                <button id="think3" onclick="think(3)" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md philosopher-button">Think</button>
+                <button id="eat3" onclick="eat(3)" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md philosopher-button">Eat</button>
+                <button id="free3" onclick="free(3)" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md philosopher-button" disabled>Free</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="message" class="text-red-600 text-center"></div>
+
+    <script>
+        const forks = [true, true, true]; // Forks availability
+
+        function think(philosopher) {
+            showMessage(`Philosopher ${philosopher} is thinking.`);
+        }
+
+        function eat(philosopher) {
+            const leftFork = philosopher - 1 === 0 ? 2 : philosopher - 2;
+            const rightFork = philosopher - 1;
+            const nextPhilosopher = philosopher === 3 ? 1 : philosopher + 1;
+            const nextLeftFork = nextPhilosopher - 1 === 0 ? 2 : nextPhilosopher - 2;
+
+            if (!forks[leftFork] || !forks[rightFork]) {
+                showMessage('Not enough forks available for eating.');
+            } else if (!forks[nextLeftFork] && !document.getElementById('eat' + nextPhilosopher).disabled) {
+                showMessage(`Philosopher ${nextPhilosopher} is eating, cannot eat now.`);
+            } else {
+                forks[leftFork] = false;
+                forks[rightFork] = false;
+                showMessage(`Philosopher ${philosopher} is eating.`);
+                document.getElementById('eat' + philosopher).disabled = true;
+            }
+        }
+
+        function free(philosopher) {
+            const leftFork = philosopher - 1 === 0 ? 2 : philosopher - 2;
+            const rightFork = philosopher - 1;
+            forks[leftFork] = true;
+            forks[rightFork] = true;
+            document.getElementById('eat' + philosopher).disabled = false;
+            showMessage(`Philosopher ${philosopher} is free now.`);
+        }
+
+        function showMessage(message) {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = message;
+        }
+    </script>
+</body>
+
+</html>
